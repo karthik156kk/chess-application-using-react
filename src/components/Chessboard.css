@@ -1,0 +1,23 @@
+.backboard{
+    background-color: blue;
+    width: 600px;
+    height: 600px;
+    display: grid;
+    grid-template-columns: repeat(8,75px);
+    grid-template-rows: repeat(8,75px);
+}
+
+.box{
+    width: 75px;
+    height: 75px;
+}
+
+.black-tile{
+    background-color: black;
+    color: white;
+}
+
+.white-tile{
+    background-color: white;
+    color: black
+}
