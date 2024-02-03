@@ -7,44 +7,25 @@ export default class Referee{
         }
         return false;
     }
-    evalIsValidMove(prevX, prevY, currX, currY, type, team, currBoardState){       
-
+    evalIsValidMove(prevX, prevY, currX, currY, type, team, currBoardState){
         if(type === pieceType.PAWN){
-            if(team === pieceTeam.OUR){
-                if(prevY===2){
-                    if(prevX===currX && currY-prevY===1){
-                        if(!this.isTileOccupied(currX, currY, currBoardState)){
-                            return true;
-                        };
-                    }else if(prevX===currX && currY-prevY===2){
-                        if(!this.isTileOccupied(currX, currY, currBoardState) && !this.isTileOccupied(currX, currY-1, currBoardState)){
-                            return true;
-                        }
+            const specialRow = (team===pieceTeam.OUR) ? 2 : 7;
+            const pawnDirection = (team===pieceTeam.OUR) ? 1 : -1;
+
+            if(prevY===specialRow){
+                if(prevX===currX && currY-prevY===pawnDirection){
+                    if(!this.isTileOccupied(currX, currY, currBoardState)){
+                        return true;
                     }
-                } else{
-                    if(prevX===currX && currY-prevY===1){
-                        if(!this.isTileOccupied(currX, currY, currBoardState)){
-                            return true;
-                        }
+                } else if(prevX===currX && currY-prevY===pawnDirection*2){
+                    if(!this.isTileOccupied(currX, currY, currBoardState) && !this.isTileOccupied(currX, currY-pawnDirection, currBoardState)){
+                        return true;
                     }
                 }
             } else{
-                if(prevY===7){
-                    if(prevX===currX && currY-prevY===-1){
-                        if(!this.isTileOccupied(currX,currY, currBoardState)){
-                            return true;
-                        }
-                    }
-                    if(prevX===currX && currY-prevY===-2){
-                        if(!this.isTileOccupied(currX, currY, currBoardState) && !this.isTileOccupied(currX, currY+1, currBoardState)){
-                            return true;
-                        }
-                    }
-                } else{
-                    if(prevX===currX && (currY-prevY===-1)){
-                        if(!this.isTileOccupied(currX, currY, currBoardState)){
-                            return true;
-                        }
+                if(prevX===currX && currY-prevY===pawnDirection){
+                    if(!this.isTileOccupied(currX, currY, currBoardState)){
+                        return true;
                     }
                 }
             }
