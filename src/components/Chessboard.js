@@ -119,8 +119,33 @@ function Chessboard() {
             const x = Math.floor((e.clientX - currentBoard.offsetLeft)/75) + 1;
             const y = Math.abs(Math.ceil((e.clientY - currentBoard.offsetTop - 600)/75) - 1);
             
+            const currentPiece = pieces.find((p) => p.x===gridX && p.y===gridY);
+            const attackPiece = pieces.find((p) => p.x===x && p.y===y);
+            // console.log(currentPiece, attackPiece);
+            if(currentPiece){
+                const validCheck = referee.evalIsValidMove(gridX, gridY, x, y, currentPiece.type, currentPiece.team, pieces);
+                if(validCheck){
+                    //updates the piece position
+                    const newPieces = pieces.reduce((result, piece)=>{
+                        if(piece.x===currentPiece.x && piece.y===currentPiece.y){
+                            piece.x = x;
+                            piece.y = y;
+                            result.push(piece);
+                        } else if(!(piece.x===x && piece.y===y)){
+                            result.push(piece);
+                        }
+                        return result;
+                    }, [])
+                    setPieces(newPieces);
+                } else{
+                    //resets the piece position
+                    activePiece.style.position = 'relative';
+                    activePiece.style.removeProperty('top');
+                    activePiece.style.removeProperty('left');
+                }
+            }
             //Snaps the pieces to new position
-            setPieces((prevPieces)=>{
+            /* setPieces((prevPieces)=>{
                 const newPieces = prevPieces.map((p)=>{
                     if(p.x ===gridX && p.y===gridY){
                         const validCheck = referee.evalIsValidMove(gridX, gridY, x, y, p.type, p.team, prevPieces);
@@ -137,7 +162,7 @@ function Chessboard() {
                     return p;
                 })
                 return newPieces;
-            })
+            }) */
             setActivePiece(null);
         }
         
