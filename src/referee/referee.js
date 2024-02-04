@@ -72,6 +72,61 @@ export default class Referee{
                     }
                 }
             }
+        } else if(type === pieceType.BISHOP){
+            for(let i=1; i<9; i++){
+                //Top Right movement
+                if(desiredPosition.x > initialPosition.x && desiredPosition.y > initialPosition.y){
+                    let passedPosition = {x: initialPosition.x + i, y: initialPosition.y + i};
+                    if(desiredPosition.x === passedPosition.x && desiredPosition.y === passedPosition.y){
+                        if(this.isTileEmptyOrEnemyOccupied(passedPosition, currBoardState, team)){
+                            return true;
+                        }
+                    } else{
+                        if(this.isTileOccupied(passedPosition, currBoardState)){
+                            break;
+                        }
+                    }
+                }
+                //Top Left movement
+                if(desiredPosition.x < initialPosition.x && desiredPosition.y > initialPosition.y){
+                    let passedPosition = {x: initialPosition.x - i, y: initialPosition.y + i};
+                    if(desiredPosition.x === passedPosition.x && desiredPosition.y === passedPosition.y){
+                        if(this.isTileEmptyOrEnemyOccupied(passedPosition, currBoardState, team)){
+                            return true;
+                        }
+                    } else{
+                        if(this.isTileOccupied(passedPosition, currBoardState)){
+                            break;
+                        }
+                    }
+                }
+                //Bottom Right movement
+                if(desiredPosition.x > initialPosition.x && desiredPosition.y < initialPosition.y){
+                    let passedPosition = {x: initialPosition.x + i, y: initialPosition.y - i};
+                    if(desiredPosition.x === passedPosition.x && desiredPosition.y === passedPosition.y){
+                        if(this.isTileEmptyOrEnemyOccupied(passedPosition, currBoardState, team)){
+                            return true;
+                        }
+                    } else{
+                        if(this.isTileOccupied(passedPosition, currBoardState)){
+                            break;
+                        }
+                    }
+                }
+                //Bottom Left movement
+                if(desiredPosition.x < initialPosition.x && desiredPosition.y < initialPosition.y){
+                    let passedPosition = {x: initialPosition.x - i, y: initialPosition.y - i};
+                    if(desiredPosition.x === passedPosition.x && desiredPosition.y === passedPosition.y){
+                        if(this.isTileEmptyOrEnemyOccupied(passedPosition, currBoardState, team)){
+                            return true;
+                        }
+                    } else{
+                        if(this.isTileOccupied(passedPosition, currBoardState)){
+                            break;
+                        }
+                    }
+                }
+            }
         }
         return false;
     }
