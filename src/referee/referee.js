@@ -88,7 +88,7 @@ export default class Referee {
             //Top Right movement
             if(desiredPosition.x > initialPosition.x && desiredPosition.y > initialPosition.y){
                 let passedPosition = {x: initialPosition.x + i, y: initialPosition.y + i};
-                if(desiredPosition.x === passedPosition.x && desiredPosition.y === passedPosition.y){
+                if(isSamePosition(desiredPosition, passedPosition)){
                     if(this.isTileEmptyOrEnemyOccupied(passedPosition, currBoardState, team)){
                         return true;
                     }
@@ -101,7 +101,7 @@ export default class Referee {
             //Top Left movement
             if(desiredPosition.x < initialPosition.x && desiredPosition.y > initialPosition.y){
                 let passedPosition = {x: initialPosition.x - i, y: initialPosition.y + i};
-                if(desiredPosition.x === passedPosition.x && desiredPosition.y === passedPosition.y){
+                if(isSamePosition(desiredPosition, passedPosition)){
                     if(this.isTileEmptyOrEnemyOccupied(passedPosition, currBoardState, team)){
                         return true;
                     }
@@ -114,7 +114,7 @@ export default class Referee {
             //Bottom Right movement
             if(desiredPosition.x > initialPosition.x && desiredPosition.y < initialPosition.y){
                 let passedPosition = {x: initialPosition.x + i, y: initialPosition.y - i};
-                if(desiredPosition.x === passedPosition.x && desiredPosition.y === passedPosition.y){
+                if(isSamePosition(desiredPosition, passedPosition)){
                     if(this.isTileEmptyOrEnemyOccupied(passedPosition, currBoardState, team)){
                         return true;
                     }
@@ -127,7 +127,7 @@ export default class Referee {
             //Bottom Left movement
             if(desiredPosition.x < initialPosition.x && desiredPosition.y < initialPosition.y){
                 let passedPosition = {x: initialPosition.x - i, y: initialPosition.y - i};
-                if(desiredPosition.x === passedPosition.x && desiredPosition.y === passedPosition.y){
+                if(isSamePosition(desiredPosition, passedPosition)){
                     if(this.isTileEmptyOrEnemyOccupied(passedPosition, currBoardState, team)){
                         return true;
                     }
@@ -146,7 +146,7 @@ export default class Referee {
             const multiplier = (desiredPosition.y > initialPosition.y) ? 1 : -1;
             for(let i=1; i<9; i++){
                 let passedPosition = {x: initialPosition.x, y: initialPosition.y + (i * multiplier)};
-                if(passedPosition.x===desiredPosition.x && passedPosition.y===desiredPosition.y){
+                if(isSamePosition(desiredPosition, passedPosition)){
                     if(this.isTileEmptyOrEnemyOccupied(passedPosition, currBoardState, team)){
                         return true;
                     }
@@ -160,7 +160,7 @@ export default class Referee {
             const multiplier = (desiredPosition.x > initialPosition.x) ? 1 : -1;
             for(let i=1; i<9; i++){
                 let passedPosition = {x: initialPosition.x + i * multiplier, y: initialPosition.y};
-                if(passedPosition.x===desiredPosition.x && passedPosition.y===desiredPosition.y){
+                if(isSamePosition(desiredPosition, passedPosition)){
                     if(this.isTileEmptyOrEnemyOccupied(passedPosition, currBoardState, team)){
                         return true;
                     }
@@ -176,37 +176,10 @@ export default class Referee {
     //Queen Movement:
     queenMove(initialPosition, desiredPosition, type, team, currBoardState){
         for(let i=1; i<9; i++){
-            //Top and Bottom movement
-            if(desiredPosition.x===initialPosition.x){
-                const multiplier = desiredPosition.y > initialPosition.y ? 1 : -1;
-                let passedPosition = {x: initialPosition.x, y: initialPosition.y+(i*multiplier)};
-                if(isSamePosition(desiredPosition, passedPosition)){
-                    if(this.isTileEmptyOrEnemyOccupied(passedPosition, currBoardState, team)){
-                        return true;
-                    }
-                } else{
-                    if(this.isTileOccupied(passedPosition, currBoardState)){
-                        break;
-                    }
-                }
-            } 
-            //Right and left movement
-            else if(desiredPosition.y===initialPosition.y){
-                const multiplier = desiredPosition.x > initialPosition.x ? 1 : -1;
-                let passedPosition = {x: initialPosition.x + (i*multiplier), y: initialPosition.y}
-                if(isSamePosition(desiredPosition, passedPosition)){
-                    if(this.isTileEmptyOrEnemyOccupied(passedPosition, currBoardState, team)){
-                        return true;
-                    }
-                } else{
-                    if(this.isTileOccupied(passedPosition, currBoardState)){
-                        break;
-                    }
-                }
-            } 
-            //Diagonal movement
-            const multiplierX = desiredPosition.x > initialPosition.x ? 1 : -1;
-            const multiplierY = desiredPosition.y > initialPosition.y ? 1 : -1;
+            //Efficient All direction - horizontal, vertical and diagonal movement
+            let multiplierX = (desiredPosition.x > initialPosition.x) ? 1 : (desiredPosition.x < initialPosition.x) ? -1 : 0;
+            let multiplierY = (desiredPosition.y > initialPosition.y) ? 1 : (desiredPosition.y < initialPosition.y) ? -1 : 0;
+
             let passedPosition = {x: initialPosition.x + (i*multiplierX), y: initialPosition.y + (i*multiplierY)};
             if(isSamePosition(desiredPosition, passedPosition)){
                 if(this.isTileEmptyOrEnemyOccupied(passedPosition, currBoardState, team)){
@@ -222,7 +195,22 @@ export default class Referee {
     }
     //King Movement:
     kingMove(initialPosition, desiredPosition, type, team, currBoardState){
-        console.log('All Hail The KING!!');
+        for(let i=1; i<2; i++){
+            //Efficient All direction - horizontal, vertical and diagonal movement
+            let multiplierX = (desiredPosition.x > initialPosition.x) ? 1 : (desiredPosition.x < initialPosition.x) ? -1 : 0;
+            let multiplierY = (desiredPosition.y > initialPosition.y) ? 1 : (desiredPosition.y < initialPosition.y) ? -1 : 0;
+
+            let passedPosition = {x: initialPosition.x + (i*multiplierX), y: initialPosition.y + (i*multiplierY)};
+            if(isSamePosition(desiredPosition, passedPosition)){
+                if(this.isTileEmptyOrEnemyOccupied(passedPosition, currBoardState, team)){
+                    return true;
+                }
+            } else{
+                if(this.isTileOccupied(passedPosition, currBoardState)){
+                    break;
+                }
+            }
+        }
         return false;
     }
     //actual requried test for movement and attacking - returned result alters the chessboard directly
