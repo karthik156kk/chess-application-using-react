@@ -27,9 +27,11 @@ for(let k=1; k<=8; k++){
 
 function Chessboard() {
     const forReference = useRef(null);
+    const modalRef = useRef(null);
     const [pieces, setPieces] = useState(initialSetup);
     const [activePiece, setActivePiece] = useState(null);
     const [grabPosition, setGrabPosition] = useState({x:-1, y:-1});
+    const [promotionPawn, setPromotionPawn] = useState();
 
     const referee = new Referee();
     let board = [];
@@ -128,6 +130,12 @@ function Chessboard() {
                             piece.enPassant = (Math.abs(y-grabPosition.y)===2 && piece.type===pieceType.PAWN);
                             piece.position.x = x;
                             piece.position.y = y;
+
+                            let promotionRow = piece.team === pieceTeam.OUR ? 8 : 1;
+                            if(y===promotionRow && piece.type===pieceType.PAWN){
+                                setPromotionPawn(piece);
+                                modalRef.current.classList.remove('hidden');
+                            }
                             result.push(piece);
                         } else if(!(isSamePosition(piece.position,{x,y}))){
                             if(piece.type===pieceType.PAWN){
@@ -148,11 +156,53 @@ function Chessboard() {
             setActivePiece(null);
         }
     }
-
+    function promotionTeamType(){
+        return (promotionPawn?.team === pieceTeam.OUR) ? 'w' : 'b';
+    }
+    function promotePawn(newType){
+        const newPieces = pieces.reduce((result, piece) => {
+            if(isSamePosition(promotionPawn.position, piece.position)){
+                piece.type = newType;
+                const imgTeam = piece.team === pieceTeam.OUR ? 'w' : 'b';
+                let imgType;
+                switch(newType){
+                    case pieceType.ROOK:
+                        imgType = 'rook';
+                        break;
+                    case pieceType.KNIGHT:
+                        imgType = 'knight';
+                        break;
+                    case pieceType.BISHOP:
+                        imgType = 'bishop';
+                        break;
+                    case pieceType.QUEEN:
+                        imgType = 'queen';
+                        break;
+                    default:
+                        break;
+                }
+                piece.image = `/assets/images/${imgType}_${imgTeam}.png`
+            }
+            result.push(piece);
+            return result;
+        }, []);
+        setPieces(newPieces);
+        modalRef.current.classList.add('hidden');
+    }
     return(
-        <div className="backboard" onMouseDown={grabElement} onMouseMove={moveElement} onMouseUp={dropElement} ref={forReference}> 
-            {board}
-        </div>
+        <>
+            <div id="pawn-promotion-modal" className= "hidden" ref={modalRef}>
+                <div className="modal-body">
+                    <img src={`/assets/images/rook_${promotionTeamType()}.png`} alt="rook" onClick = {()=>promotePawn(pieceType.ROOK)} />
+                    <img src={`/assets/images/knight_${promotionTeamType()}.png`} alt="knight" onClick = {()=>promotePawn(pieceType.KNIGHT)} />
+                    <img src={`/assets/images/bishop_${promotionTeamType()}.png`} alt="bishop" onClick = {()=>promotePawn(pieceType.BISHOP)} />
+                    <img src={`/assets/images/queen_${promotionTeamType()}.png`} alt='queen' onClick = {()=>promotePawn(pieceType.QUEEN)} />
+                </div>
+            </div>
+            <div className="backboard" onMouseDown={grabElement} onMouseMove={moveElement} onMouseUp={dropElement} ref={forReference}> 
+                {board}
+            </div>
+        </>
     )
 }
 
