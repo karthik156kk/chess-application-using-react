@@ -127,6 +127,37 @@ export default class Referee{
                     }
                 }
             }
+        } else if(type === pieceType.ROOK){
+            if(desiredPosition.x === initialPosition.x){
+                const multiplier = (desiredPosition.y > initialPosition.y) ? 1 : -1;
+                for(let i=1; i<9; i++){
+                    let passedPosition = {x: initialPosition.x, y: initialPosition.y + (i * multiplier)};
+                    console.log(passedPosition);
+                    if(passedPosition.x===desiredPosition.x && passedPosition.y===desiredPosition.y){
+                        if(this.isTileEmptyOrEnemyOccupied(passedPosition, currBoardState)){
+                            return true;
+                        }
+                    } else{
+                        if(this.isTileOccupied(passedPosition, currBoardState)){
+                            break;
+                        }
+                    }
+                }
+            } else if(desiredPosition.y === initialPosition.y){
+                const multiplier = (desiredPosition.x > initialPosition.x) ? 1 : -1;
+                for(let i=1; i<9; i++){
+                    let passedPosition = {x: initialPosition.x + i * multiplier, y: initialPosition.y};
+                    if(passedPosition.x===desiredPosition.x && passedPosition.y===desiredPosition.y){
+                        if(this.isTileEmptyOrEnemyOccupied(passedPosition, currBoardState)){
+                            return true;
+                        }
+                    } else{
+                        if(this.isTileOccupied(passedPosition, currBoardState)){
+                            break;
+                        }
+                    }
+                }
+            }
         }
         return false;
     }
