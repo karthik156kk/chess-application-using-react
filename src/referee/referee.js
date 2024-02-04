@@ -16,6 +16,26 @@ export default class Referee{
         }
         
     }
+    isEnpassantMove(px, py, x, y, playerType, playerTeam, boardState){
+        const pawnDirection = playerTeam===pieceTeam.OUR ? 1 : -1;
+        //Enpassant validations to be checked :
+        /* 
+            Whether the attackingg piece is a pawn;
+            upper left / upper right || bottom left / bottom right attck;
+            whether the piece is under (white) or above (black) the attacked tile;
+            whether the attacked piece has made an enpassant move it the previous turn
+        */
+        if(playerType === pieceType.PAWN){
+            if((x-px===-1 || x-px===1) && y-py===pawnDirection){
+                const underOverOpponent = boardState.find((p)=>p.x===x && p.y===y-pawnDirection && p.enPassant===true);
+                if(underOverOpponent){
+                    return true;
+                }
+            }
+        }
+        
+        return false;
+    }
     evalIsValidMove(prevX, prevY, currX, currY, type, team, currBoardState){
         if(type === pieceType.PAWN){
             const specialRow = (team===pieceTeam.OUR) ? 2 : 7;

@@ -121,17 +121,45 @@ function Chessboard() {
             
             const currentPiece = pieces.find((p) => p.x===gridX && p.y===gridY);
             const attackPiece = pieces.find((p) => p.x===x && p.y===y);
-            // console.log(currentPiece, attackPiece);
+            //currentPiece holds the reference the position, so if we cange thee piece cordinates in the reduce function below, 
+            //the reference currentPiece also changes which introduces bugs - to resolve this, use hardcoded gridX and gridY values in reduce funx;
             if(currentPiece){
                 const validCheck = referee.evalIsValidMove(gridX, gridY, x, y, currentPiece.type, currentPiece.team, pieces);
-                if(validCheck){
+                
+                const isEnpassant = referee.isEnpassantMove(gridX, gridY, x, y, currentPiece.type, currentPiece.team, pieces);
+                
+                const pawnDirection = currentPiece.team===pieceTeam.OUR ? 1 : -1;
+                if(isEnpassant){
+                    const newPieces = pieces.reduce((result, piece)=>{
+                        if(piece.x===gridX && piece.y===gridY){
+                            piece.x = x;
+                            piece.y = y;
+                            result.push(piece);
+                        } else if(!(piece.x===x && piece.y===y-pawnDirection)){
+                            if(piece.type === pieceType.pawn){
+                                piece.enPassant = false;
+                            }
+                            result.push(piece);
+                        }
+                        return result;
+                    }, []);
+                    setPieces(newPieces);
+                } else if(validCheck){
                     //updates the piece position
                     const newPieces = pieces.reduce((result, piece)=>{
-                        if(piece.x===currentPiece.x && piece.y===currentPiece.y){
+                        if(piece.x===gridX && piece.y===gridY){
+                            if(Math.abs(y-gridY)===2 && piece.type===pieceType.PAWN){
+                                piece.enPassant = true;
+                            } else{
+                                piece.enPassant = false;
+                            }
                             piece.x = x;
                             piece.y = y;
                             result.push(piece);
                         } else if(!(piece.x===x && piece.y===y)){
+                            if(piece.type===pieceType.PAWN){
+                                piece.enPassant = false;
+                            }
                             result.push(piece);
                         }
                         return result;
@@ -144,25 +172,7 @@ function Chessboard() {
                     activePiece.style.removeProperty('left');
                 }
             }
-            //Snaps the pieces to new position
-            /* setPieces((prevPieces)=>{
-                const newPieces = prevPieces.map((p)=>{
-                    if(p.x ===gridX && p.y===gridY){
-                        const validCheck = referee.evalIsValidMove(gridX, gridY, x, y, p.type, p.team, prevPieces);
-                        if(validCheck){
-                            p.x = x;
-                            p.y = y;
-                        }
-                        else{
-                            activePiece.style.position = 'relative';
-                            activePiece.style.removeProperty('top');
-                            activePiece.style.removeProperty('left');
-                        }
-                    }
-                    return p;
-                })
-                return newPieces;
-            }) */
+            
             setActivePiece(null);
         }
         
