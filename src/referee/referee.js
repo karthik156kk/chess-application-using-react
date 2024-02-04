@@ -1,4 +1,4 @@
-import {pieceType, pieceTeam} from '../components/constants';
+import {pieceType, pieceTeam, isSamePosition} from '../components/constants';
 export default class Referee {
     //to check whether the tile is occupied by either own piece or by opponent piece for invalid move
     isTileOccupied(tilePosition,boardState){
@@ -147,7 +147,7 @@ export default class Referee {
             for(let i=1; i<9; i++){
                 let passedPosition = {x: initialPosition.x, y: initialPosition.y + (i * multiplier)};
                 if(passedPosition.x===desiredPosition.x && passedPosition.y===desiredPosition.y){
-                    if(this.isTileEmptyOrEnemyOccupied(passedPosition, currBoardState)){
+                    if(this.isTileEmptyOrEnemyOccupied(passedPosition, currBoardState, team)){
                         return true;
                     }
                 } else{
@@ -161,7 +161,7 @@ export default class Referee {
             for(let i=1; i<9; i++){
                 let passedPosition = {x: initialPosition.x + i * multiplier, y: initialPosition.y};
                 if(passedPosition.x===desiredPosition.x && passedPosition.y===desiredPosition.y){
-                    if(this.isTileEmptyOrEnemyOccupied(passedPosition, currBoardState)){
+                    if(this.isTileEmptyOrEnemyOccupied(passedPosition, currBoardState, team)){
                         return true;
                     }
                 } else{
@@ -174,7 +174,57 @@ export default class Referee {
         return false;
     }
     //Queen Movement:
-
+    queenMove(initialPosition, desiredPosition, type, team, currBoardState){
+        for(let i=1; i<9; i++){
+            //Top and Bottom movement
+            if(desiredPosition.x===initialPosition.x){
+                const multiplier = desiredPosition.y > initialPosition.y ? 1 : -1;
+                let passedPosition = {x: initialPosition.x, y: initialPosition.y+(i*multiplier)};
+                if(isSamePosition(desiredPosition, passedPosition)){
+                    if(this.isTileEmptyOrEnemyOccupied(passedPosition, currBoardState, team)){
+                        return true;
+                    }
+                } else{
+                    if(this.isTileOccupied(passedPosition, currBoardState)){
+                        break;
+                    }
+                }
+            } 
+            //Right and left movement
+            else if(desiredPosition.y===initialPosition.y){
+                const multiplier = desiredPosition.x > initialPosition.x ? 1 : -1;
+                let passedPosition = {x: initialPosition.x + (i*multiplier), y: initialPosition.y}
+                if(isSamePosition(desiredPosition, passedPosition)){
+                    if(this.isTileEmptyOrEnemyOccupied(passedPosition, currBoardState, team)){
+                        return true;
+                    }
+                } else{
+                    if(this.isTileOccupied(passedPosition, currBoardState)){
+                        break;
+                    }
+                }
+            } 
+            //Diagonal movement
+            const multiplierX = desiredPosition.x > initialPosition.x ? 1 : -1;
+            const multiplierY = desiredPosition.y > initialPosition.y ? 1 : -1;
+            let passedPosition = {x: initialPosition.x + (i*multiplierX), y: initialPosition.y + (i*multiplierY)};
+            if(isSamePosition(desiredPosition, passedPosition)){
+                if(this.isTileEmptyOrEnemyOccupied(passedPosition, currBoardState, team)){
+                    return true;
+                }
+            } else{
+                if(this.isTileOccupied(passedPosition, currBoardState)){
+                    break;
+                }
+            }
+        }
+        return false;
+    }
+    //King Movement:
+    kingMove(initialPosition, desiredPosition, type, team, currBoardState){
+        console.log('All Hail The KING!!');
+        return false;
+    }
     //actual requried test for movement and attacking - returned result alters the chessboard directly
     evalIsValidMove(initialPosition, desiredPosition, type, team, currBoardState){
         let validCheck = false;
@@ -190,6 +240,12 @@ export default class Referee {
                 break;
             case pieceType.ROOK:
                 validCheck = this.rookMove(initialPosition, desiredPosition, type, team, currBoardState);
+                break;
+            case pieceType.QUEEN:
+                validCheck = this.queenMove(initialPosition, desiredPosition, type, team, currBoardState);
+                break;
+            case pieceType.KING:
+                validCheck = this.kingMove(initialPosition, desiredPosition, type, team, currBoardState);
                 break;
             default:
                 console.log('sorry');
